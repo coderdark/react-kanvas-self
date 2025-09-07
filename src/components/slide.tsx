@@ -22,8 +22,10 @@ export default function Slide({id, name, width, height, x, y, fill, visuals, sel
         y={y}
         fill={fill}
         visuals={visuals}
-        shadowBlur={5}
-        shadowColor={'#ccc'}
+        shadowBlur={selected ? 10 : 5}
+        stroke={selected ? '#2d7bfa' : '#cccccc'}
+        strokeWidth={selected ? 0.5 : 0}
+        shadowColor={`${selected ? '#2d7bfa' : '#cccccc'}`}
         onClick={() => handleOnClick(id)}
-        stroke={`${selected ? 'blue' : ''}`}/>
+    />
 }
