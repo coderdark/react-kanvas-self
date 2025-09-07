@@ -5,6 +5,7 @@ import type {ISlide} from "./types.ts";
 import type {KonvaNodeComponent} from "react-konva/es/ReactKonvaCore";
 import Slide from "./components/slide.tsx";
 import Background from "./components/background.tsx";
+import Toolbar from "./components/toolbar.tsx";
 
 const shapeMap: Record<string, KonvaNodeComponent<any>> = {
     circle: Circle,
@@ -153,14 +154,10 @@ export default function App() {
                     title={"Konvas Experiment"}
                     stage={stageSize}
                     slides={slides}
-                    selectedSlideId={selectedSlideId}
-                    enableShapeButtons={!!selectedSlideId}
-                    onAddNewSlide={handleAddNewSlide}
-                    onAddNewShape={(type) => handleAddNewShape(type, selectedSlideId ?? '')}/>
+                    selectedSlideId={selectedSlideId}/>
             <div className={'flex flex-col w-full h-full'}>
                 <Stage width={stageSize.width} height={stageSize.height} draggable>
-                    <Background width={stageSize.width} height={stageSize.height}
-                                color={"gray"}/>
+                    <Background/>
                     <Layer>
                         {
                             slides.map(slide =>
@@ -208,6 +205,11 @@ export default function App() {
                     </Layer>
                 </Stage>
             </div>
+            <footer className={'fixed bottom-0 p-4 bg-neutral-700 w-full'}>
+                <Toolbar enableShapeButtons={!!selectedSlideId}
+                         onAddNewSlide={handleAddNewSlide}
+                         onAddNewShape={(type) => handleAddNewShape(type, selectedSlideId ?? '')}/>
+            </footer>
         </section>
     </main>
 }
