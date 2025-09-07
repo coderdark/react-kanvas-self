@@ -21,28 +21,28 @@ export default function Toolbar({
     }
 
     return (<div className={'flex gap-4'}>
-            <button className={'bg-neutral-800 p-2 rounded text-white'} onClick={handleOnAddNewSlide}>
-                Add New Slide
+            <button className={'bg-orange-900 p-2 w-20 text-xl rounded text-white'} onClick={handleOnAddNewSlide}>
+                <span className={'font-extrabold'}>+</span>
             </button>
-            <button className={'bg-red-500 p-2 rounded text-white disabled:opacity-50'}
+            <button className={'bg-orange-900 p-2 w-20 rounded text-white disabled:opacity-50'}
                     disabled={!enableShapeButtons}
                     onClick={() => handleOnAddNewShape('star')}>
-                Add New Star
+                <span className={'text-red-500'}>★</span>
             </button>
-            <button className={'bg-green-500 p-2 rounded text-white disabled:opacity-50'}
+            <button className={'bg-orange-900 p-2 w-20 rounded text-white disabled:opacity-50'}
                     disabled={!enableShapeButtons}
                     onClick={() => handleOnAddNewShape('circle')}>
-                Add New Circle
+                <span className={'text-green-500'}>●</span>
             </button>
-            <button className={'bg-blue-500 p-2 rounded text-white disabled:opacity-50'}
+            <button className={'bg-orange-900 p-2 w-20 rounded text-white disabled:opacity-50'}
                     disabled={!enableShapeButtons}
                     onClick={() => handleOnAddNewShape('rect')}>
-                Add New Rect
+                <span className={'text-blue-500'}>■️</span>
             </button>
-            <button className={'bg-purple-500 p-2 rounded text-white disabled:opacity-50'}
+            <button className={'bg-orange-900 p-2 w-20 rounded text-white disabled:opacity-50'}
                     disabled={!enableShapeButtons}
                     onClick={() => handleOnAddNewShape('text')}>
-                Add New Text
+                <span className={'font-extrabold text-purple-500'}>T</span>
             </button>
         </div>
     )

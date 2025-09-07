@@ -1,5 +1,6 @@
 import {Circle, Group, Layer, Rect, Stage, Text, Star} from "react-konva";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
+import {CirclePicker} from 'react-color'
 import Header from "./components/header.tsx";
 import type {ISlide} from "./types.ts";
 import type {KonvaNodeComponent} from "react-konva/es/ReactKonvaCore";
@@ -17,6 +18,9 @@ const shapeMap: Record<string, KonvaNodeComponent<any>> = {
 export default function App() {
     const [slides, setSlides] = useState<ISlide[]>([]);
     const [selectedSlideId, setSelectedSlideId] = useState<string | null>(null);
+    const [selectedColor, setSelectedColor] = useState('#ffffff');
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const [stagePos, setStagePos] = useState({x: 0, y: 0});
     const [stageSize, setStageSize] = useState<{
         width: number,
         height: number
@@ -24,6 +28,7 @@ export default function App() {
         width: window.innerWidth,
         height: window.innerHeight
     });
+    const pickerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         function handleWindowResize(e: any) {
@@ -42,6 +47,17 @@ export default function App() {
         if (slides.length > 0)
             console.log("Slides", slides);
     }, [slides])
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+                setShowColorPicker(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     function getShapeConfig(type: string, slide: ISlide) {
         let config = null;
@@ -151,22 +167,73 @@ export default function App() {
         })
     }
 
+    function handleOnChangeComplete(color: any) {
+        setSelectedColor(color.hex);
+
+        setSlides((slides) => {
+            return slides.map((slide) => {
+                if (slide.id === selectedSlideId)
+                    return {...slide, fill: color.hex};
+                else
+                    return slide;
+            });
+        })
+    }
+
+    function getSelectedSlidePos(): { x: number, y: number } {
+        if (!selectedSlideId)
+            return {x: 0, y: 0};
+
+        const slide = slides.find(slide => slide.id === selectedSlideId);
+
+        if (!slide)
+            return {x: 0, y: 0};
+
+        return {x: slide.x, y: slide.y};
+    }
+
+    function handledOnContextMenu(e: any) {
+        setShowColorPicker(true);
+    }
+
     return <main className={'w-screen min-h-screen'}>
         <section className={'flex flex-col w-full h-full'}>
-            <Header className={'p-4 bg-transparent'}
+            <Header className={'p-4 bg-neutral-800 text-white z-50'}
                     title={"Konvas Experiment"}
                     stage={stageSize}
                     slides={slides}
                     selectedSlideId={selectedSlideId}/>
-            <div className={'flex flex-col w-full h-full'}>
-                <Stage width={stageSize.width} height={stageSize.height} draggable>
+            <div className={'relative w-full h-full'}>
+                <div
+                    ref={pickerRef}
+                    className={`absolute z-10 gap-4 p-4 bg-neutral-800 text-white w-72 rounded ${
+                        showColorPicker ? "block" : "hidden"
+                    }`}
+                    style={{
+                        left: getSelectedSlidePos().x,
+                        top: getSelectedSlidePos().y - 100, // offset above the slide
+                    }}
+                >
+                    <CirclePicker
+                        color={selectedColor}
+                        onChangeComplete={handleOnChangeComplete}
+                    />
+                    <p>Color: {selectedColor}</p>
+                </div>
+                <Stage width={stageSize.width} height={stageSize.height} draggable onDragMove={(e) => {
+                    const stage = e.target;
+                    setStagePos({x: stage.x(), y: stage.y()});
+                }}>
                     <Background/>
                     <Layer>
                         {
                             slides.map(slide =>
                                 <Group key={slide.id}
                                        width={slide.width}
-                                       height={slide.height}>
+                                       height={slide.height}
+                                       x={0}
+                                       y={0}
+                                       onContextMenu={handledOnContextMenu}>
                                     <Slide {...slide}
                                            onClick={(slideId) => handleOnSlideClick(slideId)}
                                            selected={slide.id === selectedSlideId}/>
@@ -177,7 +244,7 @@ export default function App() {
                                         text={slide.name}
                                         fill={'#aaa'}/>
                                     {
-                                        slide.visuals.map(visual => {
+                                        slide.visuals?.map(visual => {
                                             const Shape = shapeMap[visual.type];
 
                                             return <Shape key={visual.id} {...visual}
@@ -185,6 +252,25 @@ export default function App() {
                                                           dragBoundFunc={(pos) => {
                                                               console.log("Boundaries", pos)
                                                               return pos;
+                                                              // let newX = pos.x;
+                                                              // let newY = pos.y;
+                                                              //
+                                                              // if (visual.type === "circle") {
+                                                              //     const r = visual.radius ?? 0;
+                                                              //
+                                                              //     // clamp center of circle within slide width/height
+                                                              //     newX = Math.max(r, Math.min(newX, slide.width - r));
+                                                              //     newY = Math.max(r, Math.min(newY, slide.height - r));
+                                                              // } else {
+                                                              //     const w = visual.width ?? 0;
+                                                              //     const h = visual.height ?? 0;
+                                                              //
+                                                              //     // clamp top-left of rect/text within slide
+                                                              //     newX = Math.max(0, Math.min(newX, slide.width - w));
+                                                              //     newY = Math.max(0, Math.min(newY, slide.height - h));
+                                                              // }
+                                                              //
+                                                              // return {x: newX, y: newY};
                                                           }}
                                                           onDragMove={(evt) => {
                                                               const shape = evt.currentTarget;
@@ -208,7 +294,7 @@ export default function App() {
                     </Layer>
                 </Stage>
             </div>
-            <footer className={'fixed bottom-0 p-4 bg-neutral-700 w-full'}>
+            <footer className={'fixed bottom-0 p-4 bg-neutral-800 w-full'}>
                 <Toolbar enableShapeButtons={!!selectedSlideId}
                          onAddNewSlide={handleAddNewSlide}
                          onAddNewShape={(type) => handleAddNewShape(type, selectedSlideId ?? '')}/>

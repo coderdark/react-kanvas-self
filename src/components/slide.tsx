@@ -5,6 +5,7 @@ interface SlideProps extends ISlide {
     selected?: boolean;
     draggable?: boolean;
     onClick?: (slideId: string) => void;
+    onContextMenu?: (e: any) => void;
 }
 
 export default function Slide({
@@ -18,11 +19,18 @@ export default function Slide({
                                   visuals,
                                   selected = false,
                                   draggable = false,
-                                  onClick
+                                  onClick,
+                                  onContextMenu
                               }: SlideProps) {
     function handleOnClick(slideId: string) {
         if (onClick) {
             onClick(slideId)
+        }
+    }
+
+    function handleOnContextMenu(e: any) {
+        if (onContextMenu) {
+            onContextMenu(e)
         }
     }
 
@@ -36,10 +44,11 @@ export default function Slide({
         fill={fill}
         visuals={visuals}
         shadowBlur={selected ? 10 : 5}
-        stroke={selected ? '#2d7bfa' : '#cccccc'}
-        strokeWidth={selected ? 0.5 : 0}
-        shadowColor={`${selected ? '#2d7bfa' : '#cccccc'}`}
+        stroke={selected ? '#2d7bfa' : '#ccc'}
+        strokeWidth={selected ? 0.8 : 0.5}
+        shadowColor={`${selected ? '#2d7bfa' : '#ccc'}`}
         onClick={() => handleOnClick(id)}
         draggable={draggable}
+        onContextMenu={handleOnContextMenu}
     />
 }
