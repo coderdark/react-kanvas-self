@@ -25,7 +25,7 @@ export default function App() {
     });
 
     useEffect(() => {
-        function handleWindowResize(e) {
+        function handleWindowResize(e: any) {
             setStageSize({
                 width: e.target.innerWidth,
                 height: e.target.innerHeight
@@ -86,9 +86,9 @@ export default function App() {
                     type: 'star',
                     x: slide.x + 60,
                     y: slide.y + 64,
-                    numPoints:5, // number of star points
-                    innerRadius:20, // inner radius of the star
-                    outerRadius:53, // outer radius of the star
+                    numPoints: 5, // number of star points
+                    innerRadius: 20, // inner radius of the star
+                    outerRadius: 53, // outer radius of the star
                     fill: '#fb2c36'
                 }
                 break;
@@ -167,7 +167,9 @@ export default function App() {
                                 <Group key={slide.id}
                                        width={slide.width}
                                        height={slide.height}>
-                                    <Slide {...slide} onClick={(slideId) => handleOnSlideClick(slideId)}/>
+                                    <Slide {...slide}
+                                           onClick={(slideId) => handleOnSlideClick(slideId)}
+                                           selected={slide.id === selectedSlideId}/>
                                     <Text
                                         x={slide.x}
                                         y={slide.y - 20}

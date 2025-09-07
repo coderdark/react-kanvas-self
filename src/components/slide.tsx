@@ -2,13 +2,15 @@ import type {ISlide} from "../types.ts";
 import {Rect} from "react-konva";
 
 interface SlideProps extends ISlide {
+    selected?: boolean;
     onClick?: (slideId: string) => void;
 }
 
-export default function Slide({id, name, width, height, x, y, fill, visuals, onClick}: SlideProps) {
+export default function Slide({id, name, width, height, x, y, fill, visuals, selected = false, onClick}: SlideProps) {
     function handleOnClick(slideId: string) {
-        if (onClick)
+        if (onClick) {
             onClick(slideId)
+        }
     }
 
     return <Rect
@@ -22,5 +24,6 @@ export default function Slide({id, name, width, height, x, y, fill, visuals, onC
         visuals={visuals}
         shadowBlur={5}
         shadowColor={'#ccc'}
-        onClick={() => handleOnClick(id)}/>
+        onClick={() => handleOnClick(id)}
+        stroke={`${selected ? 'blue' : ''}`}/>
 }
