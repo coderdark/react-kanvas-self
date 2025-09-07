@@ -103,8 +103,9 @@ export default function App() {
     }
 
     function handleAddNewSlide() {
-        let y = window.innerHeight / 2 - 300;
+        const id = Date.now().toString();
         const lastSlide = slides[slides.length - 1];
+        let y = window.innerHeight / 2 - 300;
 
         if (lastSlide) {
             console.log("Last", lastSlide);
@@ -113,7 +114,7 @@ export default function App() {
 
         setSlides((slides) => {
             return [...slides, {
-                id: Date.now().toString(),
+                id: id,
                 name: `Slide # ${slides.length + 1}`,
                 width: 800,
                 height: 600,
@@ -123,6 +124,8 @@ export default function App() {
                 visuals: []
             }]
         })
+
+        setSelectedSlideId(id);
     }
 
     function handleAddNewShape(type: string, slideId: string) {
