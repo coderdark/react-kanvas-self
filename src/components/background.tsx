@@ -7,7 +7,7 @@ interface BackgroundProps {
 }
 
 export default function Background({
-                                       color = '#cbcbcb',
+                                       color = '#3b3b3b',
                                        spacing = 35,
                                        radius = 3,
                                    }: BackgroundProps) {
