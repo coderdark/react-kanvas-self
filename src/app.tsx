@@ -1,19 +1,11 @@
-import {Circle, Group, Layer, Rect, Stage, Text, Star} from "react-konva";
+import {Layer, Stage} from "react-konva";
 import {useEffect, useRef, useState} from "react";
-import {CirclePicker} from 'react-color'
+import {CirclePicker, type ColorResult} from 'react-color'
 import Header from "./components/header.tsx";
-import type {ISlide} from "./types.ts";
-import type {KonvaNodeComponent} from "react-konva/es/ReactKonvaCore";
+import type {IShape, ISlide} from "./types.ts";
 import Slide from "./components/slide.tsx";
 import Background from "./components/background.tsx";
 import Toolbar from "./components/toolbar.tsx";
-
-const shapeMap: Record<string, KonvaNodeComponent<any>> = {
-    circle: Circle,
-    rect: Rect,
-    text: Text,
-    star: Star
-};
 
 export default function App() {
     const [slides, setSlides] = useState<ISlide[]>([]);
@@ -30,11 +22,15 @@ export default function App() {
     });
     const pickerRef = useRef<HTMLDivElement>(null);
 
+    console.log(stagePos);
+
     useEffect(() => {
-        function handleWindowResize(e: any) {
+        function handleWindowResize(e: UIEvent) {
+            const window = e.target as Window;
+
             setStageSize({
-                width: e.target.innerWidth,
-                height: e.target.innerHeight
+                width: window.innerWidth,
+                height: window.innerHeight
             });
         }
 
@@ -54,8 +50,8 @@ export default function App() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    function getShapeConfig(type: string, slide: ISlide) {
-        let config = null;
+    function getShapeConfig(type: string, slide: ISlide): IShape {
+        let config = {} as IShape;
 
         switch (type) {
             case 'rect':
@@ -85,10 +81,11 @@ export default function App() {
                     type: 'text',
                     x: slide.x + 10,
                     y: slide.y + 10,
-                    width: 100,
+                    width: 200,
                     height: 10,
-                    text: 'Hello',
-                    fontSize: 14,
+                    text: 'Konva Experiment',
+                    fontSize: 18,
+                    fontStyle: 'bold',
                     fill: '#715bff'
                 }
                 break;
@@ -162,7 +159,7 @@ export default function App() {
         })
     }
 
-    function handleOnChangeComplete(color: any) {
+    function handleOnChangeComplete(color: ColorResult) {
         setSelectedColor(color.hex);
 
         setSlides((slides) => {
@@ -187,7 +184,7 @@ export default function App() {
         return {x: slide.x, y: slide.y};
     }
 
-    function handledOnContextMenu(e: any) {
+    function handleOnContextMenu() {
         setShowColorPicker(true);
     }
 
@@ -223,68 +220,10 @@ export default function App() {
                     <Layer>
                         {
                             slides.map(slide =>
-                                <Group key={slide.id}
-                                       width={slide.width}
-                                       height={slide.height}
-                                       x={0}
-                                       y={0}
-                                       onContextMenu={handledOnContextMenu}>
-                                    <Slide {...slide}
-                                           onClick={(slideId) => handleOnSlideClick(slideId)}
-                                           selected={slide.id === selectedSlideId}/>
-                                    <Text
-                                        x={slide.x}
-                                        y={slide.y - 20}
-                                        fontSize={14}
-                                        text={slide.name}
-                                        fill={'#aaa'}/>
-                                    {
-                                        slide.visuals?.map(visual => {
-                                            const Shape = shapeMap[visual.type];
-
-                                            return <Shape key={visual.id} {...visual}
-                                                          draggable
-                                                          dragBoundFunc={(pos) => {
-                                                              console.log("Boundaries", pos)
-                                                              return pos;
-                                                              // let newX = pos.x;
-                                                              // let newY = pos.y;
-                                                              //
-                                                              // if (visual.type === "circle") {
-                                                              //     const r = visual.radius ?? 0;
-                                                              //
-                                                              //     // clamp center of circle within slide width/height
-                                                              //     newX = Math.max(r, Math.min(newX, slide.width - r));
-                                                              //     newY = Math.max(r, Math.min(newY, slide.height - r));
-                                                              // } else {
-                                                              //     const w = visual.width ?? 0;
-                                                              //     const h = visual.height ?? 0;
-                                                              //
-                                                              //     // clamp top-left of rect/text within slide
-                                                              //     newX = Math.max(0, Math.min(newX, slide.width - w));
-                                                              //     newY = Math.max(0, Math.min(newY, slide.height - h));
-                                                              // }
-                                                              //
-                                                              // return {x: newX, y: newY};
-                                                          }}
-                                                          onDragMove={(evt) => {
-                                                              const shape = evt.currentTarget;
-
-                                                              if (shape.x() >= slide.x && shape.x() <= (slide.x + slide.width) - visual.width) {
-                                                                  console.log("Dragged", "Shape X", shape.x(), "Slide X", slide.x);
-                                                              } else {
-                                                                  console.log("Not Dragged", "Shape X", shape.x(), "Slide X", slide.x);
-                                                              }
-
-                                                              if (shape.y() >= slide.y && shape.y() <= (slide.y + slide.height) - visual.height) {
-                                                                  console.log("Dragged", "Shape Y", shape.x(), "Slide Y", slide.x);
-                                                              } else {
-                                                                  console.log("Not Dragged", "Shape Y", shape.x(), "Slide Y", slide.x);
-                                                              }
-                                                          }}/>
-                                        })
-                                    }
-                                </Group>)
+                                <Slide {...slide}
+                                       onClick={(slideId) => handleOnSlideClick(slideId)}
+                                       onContextMenu={handleOnContextMenu}
+                                       selected={slide.id === selectedSlideId}/>)
                         }
                     </Layer>
                 </Stage>

@@ -3,11 +3,12 @@ export interface IShape {
     type: string;
     x: number;
     y: number;
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     radius?: number;
     text?: string;
     fontSize?: number;
+    fontStyle?: string;
     numPoints?: number;
     innerRadius?: number;
     outerRadius?: number;
