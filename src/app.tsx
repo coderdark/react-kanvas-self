@@ -44,11 +44,6 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-        if (slides.length > 0)
-            console.log("Slides", slides);
-    }, [slides])
-
-    useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
             if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
                 setShowColorPicker(false);
